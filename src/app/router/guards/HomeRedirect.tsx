@@ -9,5 +9,9 @@ export const HomeRedirect = () => {
     return <Navigate to="/" replace />;
   }
 
+  if (!user.registrationCompleted) {
+    return <Navigate to="/complete-registration" replace />;
+  }
+
   return <Navigate to={getHomePathByRole(user.role)} replace />;
 };

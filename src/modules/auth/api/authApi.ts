@@ -1,10 +1,12 @@
 import { baseApi } from '../../../common/api/baseApi';
 import type {
   RegisterRequest,
+  RegisterResponse,
   AuthResponse,
   LoginLocalRequest,
   LoginResponse,
   LoginGoogleRequest,
+  CompleteRegistrationRequest,
 } from '../types/auth.types';
 
 export const authApi = baseApi.injectEndpoints({
@@ -35,9 +37,21 @@ export const authApi = baseApi.injectEndpoints({
       invalidatesTags: ['Auth'],
     }),
 
-    register: builder.mutation<AuthResponse, RegisterRequest>({
+    register: builder.mutation<RegisterResponse, RegisterRequest>({
       query: (body) => ({
         url: '/identity/register',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Auth'],
+    }),
+
+    completeRegistration: builder.mutation<
+      LoginResponse,
+      CompleteRegistrationRequest
+    >({
+      query: (body) => ({
+        url: '/identity/complete-registration',
         method: 'POST',
         body,
       }),
@@ -59,5 +73,6 @@ export const {
   useLoginMutation,
   useLoginWithGoogleMutation,
   useRegisterMutation,
+  useCompleteRegistrationMutation,
   useLogoutMutation,
 } = authApi;

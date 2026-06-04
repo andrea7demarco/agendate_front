@@ -6,5 +6,6 @@ export const useAuth = () => {
   return {
     user: auth.user,
     isAuthenticated: auth.isAuthenticated,
+    isLoading: false,
   };
 };

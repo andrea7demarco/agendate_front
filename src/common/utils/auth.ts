@@ -4,8 +4,13 @@ export const getHomePathByRole = (role: UserRole) => {
   switch (role) {
     case ROLES.ADMIN:
       return '/admin';
+
     case ROLES.PROFESSIONAL:
-      return '/professional';
+      return '/';
+
+    case ROLES.PATIENT:
+      return '/';
+
     default:
       return '/';
   }

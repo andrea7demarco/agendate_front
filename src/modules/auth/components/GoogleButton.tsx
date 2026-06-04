@@ -25,12 +25,7 @@ export const GoogleButton: React.FC = () => {
         return;
       }
 
-      const payload = {
-        idToken,
-        registrationKind: 'paciente' as 'paciente' | 'profesional',
-      };
-
-      const response = await googleLogin(payload).unwrap();
+      const response = await googleLogin({ idToken }).unwrap();
 
       enqueueSnackbar('Inicio de sesión exitoso', {
         variant: 'success',
@@ -42,6 +37,11 @@ export const GoogleButton: React.FC = () => {
           accessToken: response.accessToken,
         }),
       );
+
+      if (!response.user.registrationCompleted) {
+        navigate('/complete-registration');
+        return;
+      }
 
       navigate(getHomePathByRole(response.user.role));
     } catch (error) {
