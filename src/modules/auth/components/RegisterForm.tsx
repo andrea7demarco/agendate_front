@@ -44,7 +44,6 @@ type ApiError = {
 
 const ARGENTINA_PROVINCES = [
   'Buenos Aires',
-  'Ciudad Autonoma de Buenos Aires',
   'Catamarca',
   'Chaco',
   'Chubut',
@@ -112,7 +111,7 @@ const hasChildren = (specialty: Specialty, specialties: Specialty[]) =>
 const isDisabilityRoot = (specialty: Specialty) => {
   const name = normalizeText(specialty.name);
 
-  return name.includes('discapacidad') && name.includes('rehabilitacion');
+  return name.includes('discapacidad') && name.includes('rehabilitación');
 };
 
 const isDescendantOf = (
@@ -160,7 +159,7 @@ export const RegisterForm = () => {
   const disabilityRoot = specialties.find(
     (specialty) =>
       specialty.name.toLowerCase() === 'discapacidad y rehabilitación' ||
-      specialty.name.toLowerCase() === 'discapacidad y rehabilitacion',
+      specialty.name.toLowerCase() === 'discapacidad y rehabilitación',
   );
   const careerOptions = disabilityRoot
     ? specialties.filter(
@@ -176,7 +175,8 @@ export const RegisterForm = () => {
   );
   const rootCareerOptions = normalizedDisabilityRoot
     ? specialties.filter(
-        (specialty) => specialty.parentSpecialtyId === normalizedDisabilityRoot.id,
+        (specialty) =>
+          specialty.parentSpecialtyId === normalizedDisabilityRoot.id,
       )
     : [];
   const effectiveCareerOptions =
@@ -267,10 +267,9 @@ export const RegisterForm = () => {
         }
 
         if (values.registrationKind === 'profesional') {
-          const specialtyIds = [
-            values.careerId,
-            ...values.specialtyIds,
-          ].filter((id): id is number => typeof id === 'number');
+          const specialtyIds = [values.careerId, ...values.specialtyIds].filter(
+            (id): id is number => typeof id === 'number',
+          );
 
           const finalPhone = normalizePhoneForWhatsApp(
             values.phoneNumber,
@@ -350,14 +349,14 @@ export const RegisterForm = () => {
           setCredentials({
             user: loginResponse.user,
             accessToken: loginResponse.accessToken,
-          })
+          }),
         );
 
         enqueueSnackbar('Registro completado exitosamente', {
           variant: 'success',
         });
 
-navigate(getHomePathByRole(loginResponse.user.role));
+        navigate(getHomePathByRole(loginResponse.user.role));
       } catch (error) {
         const message =
           error instanceof Error
@@ -390,8 +389,12 @@ navigate(getHomePathByRole(loginResponse.user.role));
     <form onSubmit={formik.handleSubmit}>
       <Stack spacing={3}>
         <Typography variant="h4">Crear cuenta</Typography>
+        <Typography variant="body2" color="text.secondary">
+          Los campos marcados con * son obligatorios.
+        </Typography>
 
         <TextField
+          required
           label="Nombre"
           name="firstName"
           value={formik.values.firstName}
@@ -402,6 +405,7 @@ navigate(getHomePathByRole(loginResponse.user.role));
         />
 
         <TextField
+          required
           label="Apellido"
           name="lastName"
           value={formik.values.lastName}
@@ -412,6 +416,7 @@ navigate(getHomePathByRole(loginResponse.user.role));
         />
 
         <TextField
+          required
           label="Email"
           name="email"
           value={formik.values.email}
@@ -422,6 +427,7 @@ navigate(getHomePathByRole(loginResponse.user.role));
         />
 
         <TextField
+          required
           label="Contraseña"
           name="password"
           type="password"
@@ -433,6 +439,7 @@ navigate(getHomePathByRole(loginResponse.user.role));
         />
 
         <TextField
+          required
           select
           label="Tipo de usuario"
           name="registrationKind"
@@ -454,6 +461,7 @@ navigate(getHomePathByRole(loginResponse.user.role));
         {formik.values.registrationKind === 'paciente' && (
           <>
             <TextField
+              required
               label="Fecha de nacimiento"
               name="birthDate"
               type="date"
@@ -468,8 +476,9 @@ navigate(getHomePathByRole(loginResponse.user.role));
             />
 
             <TextField
+              required
               select
-              label="Genero"
+              label="Género"
               name="gender"
               value={formik.values.gender}
               onChange={formik.handleChange}
@@ -479,10 +488,10 @@ navigate(getHomePathByRole(loginResponse.user.role));
             >
               <MenuItem value={1}>Masculino</MenuItem>
               <MenuItem value={2}>Femenino</MenuItem>
-              <MenuItem value={3}>Otro</MenuItem>
             </TextField>
 
             <FormControlLabel
+             required
               control={
                 <Checkbox
                   name="hasCud"
@@ -490,7 +499,7 @@ navigate(getHomePathByRole(loginResponse.user.role));
                   onChange={formik.handleChange}
                 />
               }
-              label="Tiene Certificado Unico de Discapacidad (CUD)"
+              label="Tiene Certificado Único de Discapacidad (CUD)"
             />
 
             <FormControlLabel
@@ -521,7 +530,9 @@ navigate(getHomePathByRole(loginResponse.user.role));
                   : 'No hay obras sociales cargadas'
               }
               getOptionLabel={(option) =>
-                option.acronym ? `${option.acronym} - ${option.name}` : option.name
+                option.acronym
+                  ? `${option.acronym} - ${option.name}`
+                  : option.name
               }
               isOptionEqualToValue={(option, value) => option.id === value.id}
               onChange={(_, values) => {
@@ -564,60 +575,70 @@ navigate(getHomePathByRole(loginResponse.user.role));
 
             {!formik.values.hasNoHealthInsurance &&
               formik.values.healthInsurances.map((item, index) => {
-              const healthInsurance = healthInsurances.find(
-                (option) => option.id === item.healthInsuranceId,
-              );
+                const healthInsurance = healthInsurances.find(
+                  (option) => option.id === item.healthInsuranceId,
+                );
 
-              return (
-                <Box
-                  key={item.healthInsuranceId}
-                  sx={{
-                    p: 2,
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    borderRadius: 2,
-                  }}
-                >
-                  <Typography fontWeight={700} sx={{ mb: 1.5 }}>
-                    {healthInsurance?.acronym || 'Obra social'}
-                  </Typography>
+                return (
+                  <Box
+                    key={item.healthInsuranceId}
+                    sx={{
+                      p: 2,
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: 2,
+                    }}
+                  >
+                    <Typography fontWeight={700} sx={{ mb: 1.5 }}>
+                      {healthInsurance?.acronym || 'Obra social'}
+                    </Typography>
 
-                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                    <TextField
-                      label="Numero de afiliado"
-                      value={item.affiliateNumber}
-                      onChange={(event) => {
-                        const next = [...formik.values.healthInsurances];
-                        next[index] = {
-                          ...next[index],
-                          affiliateNumber: event.target.value,
-                        };
-                        void formik.setFieldValue('healthInsurances', next);
-                      }}
-                    />
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                      <TextField
+                        label="Número de afiliado"
+                        value={item.affiliateNumber}
+                        onChange={(event) => {
+                          const next = [...formik.values.healthInsurances];
+                          next[index] = {
+                            ...next[index],
+                            affiliateNumber: event.target.value,
+                          };
+                          void formik.setFieldValue('healthInsurances', next);
+                        }}
+                      />
 
-                    <TextField
-                      label="Plan"
-                      value={item.planName}
-                      onChange={(event) => {
-                        const next = [...formik.values.healthInsurances];
-                        next[index] = {
-                          ...next[index],
-                          planName: event.target.value,
-                        };
-                        void formik.setFieldValue('healthInsurances', next);
-                      }}
-                    />
-                  </Stack>
-                </Box>
-              );
-            })}
+                      <TextField
+                        label="Plan"
+                        value={item.planName}
+                        onChange={(event) => {
+                          const next = [...formik.values.healthInsurances];
+                          next[index] = {
+                            ...next[index],
+                            planName: event.target.value,
+                          };
+                          void formik.setFieldValue('healthInsurances', next);
+                        }}
+                      />
+                    </Stack>
+                  </Box>
+                );
+              })}
           </>
         )}
 
         {formik.values.registrationKind === 'profesional' && (
           <>
+            <Box>
+              <Typography variant="h6" fontWeight={700}>
+                Datos profesionales
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Información básica para validar y mostrar tu perfil.
+              </Typography>
+            </Box>
+
             <TextField
+              required
               label="DNI"
               name="dni"
               value={formik.values.dni}
@@ -630,6 +651,7 @@ navigate(getHomePathByRole(loginResponse.user.role));
             <Box>
               <Stack direction="row" spacing={1}>
                 <TextField
+                  required
                   select
                   label="País"
                   name="phonePrefix"
@@ -646,6 +668,7 @@ navigate(getHomePathByRole(loginResponse.user.role));
                 </TextField>
 
                 <TextField
+                  required
                   fullWidth
                   label="Teléfono (WhatsApp)"
                   name="phoneNumber"
@@ -659,10 +682,15 @@ navigate(getHomePathByRole(loginResponse.user.role));
                   }
                 />
               </Stack>
-              
+
               <Box sx={{ mt: 0.5, px: 1.5 }}>
-                <Typography variant="caption" color="text.secondary" display="block">
-                  Ingresa el código de área <strong>sin el 0</strong> y el número <strong>sin el 15</strong>.
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  display="block"
+                >
+                  Ingresa el código de área <strong>sin el 0</strong> y el
+                  número <strong>sin el 15</strong>.
                 </Typography>
                 {formik.touched.phoneNumber && formik.errors.phoneNumber && (
                   <Typography variant="caption" color="error" display="block">
@@ -671,9 +699,18 @@ navigate(getHomePathByRole(loginResponse.user.role));
                 )}
               </Box>
             </Box>
-         
+
+            <Box>
+              <Typography variant="h6" fontWeight={700}>
+                Atención
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Define modalidad, costo y datos de matrícula.
+              </Typography>
+            </Box>
 
             <TextField
+              required
               label="Costo de consulta"
               name="consultationCost"
               type="number"
@@ -691,8 +728,9 @@ navigate(getHomePathByRole(loginResponse.user.role));
             />
 
             <TextField
+              required
               select
-              label="Tipo de atencion"
+              label="Tipo de atención"
               name="appointmentType"
               value={formik.values.appointmentType}
               onChange={formik.handleChange}
@@ -710,8 +748,17 @@ navigate(getHomePathByRole(loginResponse.user.role));
               <MenuItem value="Ambos">Ambos</MenuItem>
             </TextField>
 
+            <Box>
+              <Typography variant="h6" fontWeight={700}>
+                Ubicación
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Carga el consultorio o lugar donde atendes presencialmente.
+              </Typography>
+            </Box>
+
             <AddressAutocomplete
-              label="Direccion del consultorio"
+              label="Dirección del consultorio"
               value={formik.values.location}
               error={formik.touched.location && Boolean(formik.errors.location)}
               helperText={
@@ -750,6 +797,7 @@ navigate(getHomePathByRole(loginResponse.user.role));
             />
 
             <TextField
+              required
               select
               label="Provincia"
               name="province"
@@ -767,6 +815,7 @@ navigate(getHomePathByRole(loginResponse.user.role));
             </TextField>
 
             <TextField
+              required
               label="Ciudad"
               name="city"
               value={formik.values.city}
@@ -777,7 +826,8 @@ navigate(getHomePathByRole(loginResponse.user.role));
             />
 
             <TextField
-              label="Matricula nacional"
+              required
+              label="Matrícula nacional"
               name="nationalLicense"
               value={formik.values.nationalLicense}
               onChange={formik.handleChange}
@@ -787,13 +837,13 @@ navigate(getHomePathByRole(loginResponse.user.role));
                 Boolean(formik.errors.nationalLicense)
               }
               helperText={
-                formik.touched.nationalLicense &&
-                formik.errors.nationalLicense
+                formik.touched.nationalLicense && formik.errors.nationalLicense
               }
             />
 
             <TextField
-              label="Matricula provincial"
+              required
+              label="Matrícula provincial"
               name="provincialLicense"
               value={formik.values.provincialLicense}
               onChange={formik.handleChange}
@@ -807,6 +857,15 @@ navigate(getHomePathByRole(loginResponse.user.role));
                 formik.errors.provincialLicense
               }
             />
+
+            <Box>
+              <Typography variant="h6" fontWeight={700}>
+                Carrera y especialidades
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Selecciona primero tu carrera y después tus especialidades.
+              </Typography>
+            </Box>
 
             <Autocomplete
               options={effectiveCareerOptions}
@@ -830,12 +889,12 @@ navigate(getHomePathByRole(loginResponse.user.role));
               onBlur={() => formik.setFieldTouched('careerId', true)}
               renderInput={(params) => (
                 <TextField
+                  required
                   {...params}
                   label="Carrera"
                   placeholder="Buscar carrera"
                   error={
-                    formik.touched.careerId &&
-                    Boolean(formik.errors.careerId)
+                    formik.touched.careerId && Boolean(formik.errors.careerId)
                   }
                   helperText={
                     formik.touched.careerId &&
@@ -844,68 +903,6 @@ navigate(getHomePathByRole(loginResponse.user.role));
                 />
               )}
             />
-
-            <TextField
-              label="Biografia"
-              name="biography"
-              multiline
-              minRows={3}
-              value={formik.values.biography}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={
-                formik.touched.biography && Boolean(formik.errors.biography)
-              }
-              helperText={formik.touched.biography && formik.errors.biography}
-            />
-
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <TextField
-                fullWidth
-                label="Titulo profesional"
-                name="degreeTitle"
-                value={formik.values.degreeTitle}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={
-                  formik.touched.degreeTitle &&
-                  Boolean(formik.errors.degreeTitle)
-                }
-                helperText={
-                  formik.touched.degreeTitle && formik.errors.degreeTitle
-                }
-              />
-
-              <TextField
-                fullWidth
-                label="Donde estudiaste"
-                name="university"
-                value={formik.values.university}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                error={
-                  formik.touched.university && Boolean(formik.errors.university)
-                }
-                helperText={formik.touched.university && formik.errors.university}
-              />
-            </Stack>
-
-            <TextField
-              label="Anio de recibido"
-              name="graduationYear"
-              type="number"
-              value={formik.values.graduationYear}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={
-                formik.touched.graduationYear &&
-                Boolean(formik.errors.graduationYear)
-              }
-              helperText={
-                formik.touched.graduationYear && formik.errors.graduationYear
-              }
-            />
-
             <Autocomplete
               multiple
               options={specialtyOptions}
@@ -948,6 +945,96 @@ navigate(getHomePathByRole(loginResponse.user.role));
               )}
             />
 
+            <Box>
+              <Typography variant="h6" fontWeight={700}>
+                Presentación
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Agrega una breve descripcion para que los pacientes te conozcan.
+              </Typography>
+            </Box>
+
+            <TextField
+              label="Biografía"
+              name="biography"
+              multiline
+              minRows={3}
+              value={formik.values.biography}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={
+                formik.touched.biography && Boolean(formik.errors.biography)
+              }
+              helperText={formik.touched.biography && formik.errors.biography}
+            />
+
+            <Box>
+              <Typography variant="h6" fontWeight={700}>
+                Educación
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Indica tu título, institución y año de recibido.
+              </Typography>
+            </Box>
+
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+              <TextField
+                fullWidth
+                label="Título profesional"
+                name="degreeTitle"
+                value={formik.values.degreeTitle}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.degreeTitle &&
+                  Boolean(formik.errors.degreeTitle)
+                }
+                helperText={
+                  formik.touched.degreeTitle && formik.errors.degreeTitle
+                }
+              />
+
+              <TextField
+                fullWidth
+                label="Universidad"
+                name="university"
+                value={formik.values.university}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.university && Boolean(formik.errors.university)
+                }
+                helperText={
+                  formik.touched.university && formik.errors.university
+                }
+              />
+            </Stack>
+
+            <TextField
+              label="Año de recibido"
+              name="graduationYear"
+              type="number"
+              value={formik.values.graduationYear}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={
+                formik.touched.graduationYear &&
+                Boolean(formik.errors.graduationYear)
+              }
+              helperText={
+                formik.touched.graduationYear && formik.errors.graduationYear
+              }
+            />
+
+            <Box>
+              <Typography variant="h6" fontWeight={700}>
+                Pacientes y disponibilidad
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Indicá qué pacientes atendés y en qué días/horarios.
+              </Typography>
+            </Box>
+
             <Autocomplete
               multiple
               options={PATIENT_GROUP_OPTIONS}
@@ -966,7 +1053,7 @@ navigate(getHomePathByRole(loginResponse.user.role));
                 <TextField
                   {...params}
                   label="Tipos de pacientes que atiende"
-                  placeholder="Bebes, ninios, adultos..."
+                  placeholder="Bebés, niños, adultos..."
                 />
               )}
             />
@@ -996,7 +1083,10 @@ navigate(getHomePathByRole(loginResponse.user.role));
                       value={training.title}
                       onChange={(event) => {
                         const next = [...formik.values.trainings];
-                        next[index] = { ...next[index], title: event.target.value };
+                        next[index] = {
+                          ...next[index],
+                          title: event.target.value,
+                        };
                         void formik.setFieldValue('trainings', next);
                       }}
                     />
@@ -1017,11 +1107,14 @@ navigate(getHomePathByRole(loginResponse.user.role));
                       <TextField
                         fullWidth
                         type="number"
-                        label="Anio"
+                        label="Año"
                         value={training.year}
                         onChange={(event) => {
                           const next = [...formik.values.trainings];
-                          next[index] = { ...next[index], year: event.target.value };
+                          next[index] = {
+                            ...next[index],
+                            year: event.target.value,
+                          };
                           void formik.setFieldValue('trainings', next);
                         }}
                       />
@@ -1029,7 +1122,7 @@ navigate(getHomePathByRole(loginResponse.user.role));
                     <TextField
                       multiline
                       minRows={2}
-                      label="Descripcion opcional"
+                      label="Descripción opcional"
                       value={training.description}
                       onChange={(event) => {
                         const next = [...formik.values.trainings];
@@ -1075,6 +1168,16 @@ navigate(getHomePathByRole(loginResponse.user.role));
               </Button>
             </Stack>
 
+            <Box>
+              <Typography variant="h6" fontWeight={700}>
+                Obras sociales
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Selecciona las obras sociales que aceptas o marca que no
+                atendes.
+              </Typography>
+            </Box>
+
             <Autocomplete
               multiple
               options={healthInsurances}
@@ -1087,7 +1190,9 @@ navigate(getHomePathByRole(loginResponse.user.role));
                   : 'No hay obras sociales cargadas'
               }
               getOptionLabel={(option) =>
-                option.acronym ? `${option.acronym} - ${option.name}` : option.name
+                option.acronym
+                  ? `${option.acronym} - ${option.name}`
+                  : option.name
               }
               isOptionEqualToValue={(option, value) => option.id === value.id}
               onChange={(_, value) => {
