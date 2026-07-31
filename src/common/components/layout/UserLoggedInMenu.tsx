@@ -9,6 +9,7 @@ import {
 import ProfileIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { User } from '../../types/auth';
 import { useLogoutMutation } from '../../../modules/auth/api/authApi';
 import { clearCredentials } from '../../../modules/auth/store/authSlice';
@@ -16,35 +17,66 @@ import { useAppDispatch } from '../../../app/hooks';
 
 type UserMenuProps = {
   loggedUser: User | null;
-  anchorEl: null | HTMLElement;
-  setAnchorEl: (anchorEl: null | HTMLElement) => void;
+  anchorEl: HTMLElement | null;
+  setAnchorEl: (anchorEl: HTMLElement | null) => void;
 };
 
-const UserLoggedInMenu: React.FC<UserMenuProps> = (props) => {
-  const { loggedUser, anchorEl, setAnchorEl } = props;
+const UserLoggedInMenu: React.FC<UserMenuProps> = ({
+  loggedUser,
+  anchorEl,
+  setAnchorEl,
+}) => {
   const open = Boolean(anchorEl);
 
-  const [logout] = useLogoutMutation();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const [logout] = useLogoutMutation();
 
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  const handleLogout = () => {
-    logout().unwrap();
-    dispatch(clearCredentials());
-    handleClose();
+  const handleProfile = (
+  event: React.MouseEvent<HTMLLIElement>
+  ) => {
+  event.currentTarget.blur();
+  handleClose();
+
+  setTimeout(() => {
+    navigate('/mi-perfil');
+  }, 0);
   };
+
+  
+
+  const handleLogout = async (
+  event: React.MouseEvent<HTMLLIElement>
+) => {
+  event.currentTarget.blur();
+  handleClose();
+
+  try {
+    await logout().unwrap();
+  } finally {
+    dispatch(clearCredentials());
+
+    setTimeout(() => {
+      navigate('/');
+    }, 0);
+  }
+};
+
+  const initials = loggedUser
+    ? `${loggedUser.firstName?.[0] ?? ''}${loggedUser.lastName?.[0] ?? ''}`
+    : 'U';
 
   return (
     <Menu
       id="user-menu"
-      aria-labelledby="user-menu"
-      style={{ marginTop: 12, marginRight: 6 }}
       anchorEl={anchorEl}
       open={open}
       onClose={handleClose}
+      sx={{ mt: 1.5, mr: 0.75 }}
     >
       <Box
         display="flex"
@@ -61,10 +93,9 @@ const UserLoggedInMenu: React.FC<UserMenuProps> = (props) => {
             display: 'flex',
           }}
         >
-          {loggedUser
-            ? `${loggedUser.firstName[0]}${loggedUser.lastName[0]}`
-            : 'U'}
+          {initials}
         </Avatar>
+
         <Box
           display="flex"
           flexDirection="column"
@@ -76,13 +107,15 @@ const UserLoggedInMenu: React.FC<UserMenuProps> = (props) => {
               ? `${loggedUser.firstName} ${loggedUser.lastName}`
               : 'Usuario'}
           </Typography>
-          <Typography style={{ fontSize: '0.9em', color: '#888' }}>
-            {loggedUser ? loggedUser.email : ''}
+
+          <Typography sx={{ fontSize: '0.9em', color: '#888' }}>
+            {loggedUser?.email ?? ''}
           </Typography>
         </Box>
       </Box>
 
-      <Divider orientation="horizontal" />
+      <Divider />
+
       <MenuItem
         sx={{
           display: 'flex',
@@ -91,13 +124,14 @@ const UserLoggedInMenu: React.FC<UserMenuProps> = (props) => {
           justifyContent: 'space-between',
           alignItems: 'center',
         }}
-        onClick={() => console.log('Profile clicked')}
+        onClick={handleProfile}
       >
         Perfil
         <ProfileIcon />
       </MenuItem>
 
-      <Divider orientation="horizontal" />
+      <Divider />
+
       <MenuItem
         sx={{
           display: 'flex',
@@ -108,7 +142,7 @@ const UserLoggedInMenu: React.FC<UserMenuProps> = (props) => {
         }}
         onClick={handleLogout}
       >
-        Cerrar Sesion
+        Cerrar sesión
         <LogoutIcon />
       </MenuItem>
     </Menu>

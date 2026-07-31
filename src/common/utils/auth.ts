@@ -15,3 +15,14 @@ export const getHomePathByRole = (role: UserRole) => {
       return '/';
   }
 };
+
+export const getSafeRedirectPath = (
+  redirect: string | null,
+  fallback: string,
+) => {
+  if (!redirect || !redirect.startsWith('/') || redirect.startsWith('//')) {
+    return fallback;
+  }
+
+  return redirect;
+};

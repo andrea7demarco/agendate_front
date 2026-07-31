@@ -1,17 +1,21 @@
 import { Button, Stack, TextField, Typography } from '@mui/material';
 import { useFormik } from 'formik';
 import { loginSchema } from '../schemas/loginSchema';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLoginMutation } from '../api/authApi';
 import { useAppDispatch } from '../../../app/hooks';
 import { setCredentials } from '../store/authSlice';
-import { getHomePathByRole } from '../../../common/utils/auth';
+import {
+  getHomePathByRole,
+  getSafeRedirectPath,
+} from '../../../common/utils/auth';
 import { useSnackbar } from 'notistack';
 
 export const LoginForm = () => {
   const [login, { isLoading }] = useLoginMutation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { enqueueSnackbar } = useSnackbar();
 
   const formik = useFormik({
@@ -33,7 +37,13 @@ export const LoginForm = () => {
           variant: 'success',
         });
 
-        navigate(getHomePathByRole(user.role));
+        navigate(
+          getSafeRedirectPath(
+            searchParams.get('redirect'),
+            getHomePathByRole(user.role),
+          ),
+          { replace: true },
+        );
       } catch (error) {
         helpers.setStatus('Credenciales inválidas');
 

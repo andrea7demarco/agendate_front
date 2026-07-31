@@ -2,8 +2,11 @@ import React from 'react';
 import { Box } from '@mui/material';
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { useLoginWithGoogleMutation } from '../api/authApi';
-import { getHomePathByRole } from '../../../common/utils/auth';
-import { useNavigate } from 'react-router-dom';
+import {
+  getHomePathByRole,
+  getSafeRedirectPath,
+} from '../../../common/utils/auth';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { useAppDispatch } from '../../../app/hooks';
 import { setCredentials } from '../store/authSlice';
@@ -11,6 +14,7 @@ import { setCredentials } from '../store/authSlice';
 export const GoogleButton: React.FC = () => {
   const [googleLogin] = useLoginWithGoogleMutation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useAppDispatch();
 
@@ -39,11 +43,22 @@ export const GoogleButton: React.FC = () => {
       );
 
       if (!response.user.registrationCompleted) {
-        navigate('/complete-registration');
+        const redirect = searchParams.get('redirect');
+        navigate(
+          redirect
+            ? `/complete-registration?redirect=${encodeURIComponent(redirect)}`
+            : '/complete-registration',
+        );
         return;
       }
 
-      navigate(getHomePathByRole(response.user.role));
+      navigate(
+        getSafeRedirectPath(
+          searchParams.get('redirect'),
+          getHomePathByRole(response.user.role),
+        ),
+        { replace: true },
+      );
     } catch (error) {
       enqueueSnackbar('No se pudo iniciar sesión con Google', {
         variant: 'error',

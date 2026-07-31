@@ -7,23 +7,29 @@ import {
   IconButton,
   Stack,
   Toolbar,
-  TextField,
 } from '@mui/material';
 import React, { useState } from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useNavigate } from 'react-router-dom';
+import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
+import { useLocation, useNavigate } from 'react-router-dom';
 import UserLoggedInMenu from './UserLoggedInMenu';
 import { useAuth } from '../../hooks/useAuth';
+import { ProfessionalSearchBar } from './ProfessionalSearchBar';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const loggedUser = useAuth().user;
 
   const isLoggedIn = Boolean(loggedUser);
+  const hasCompletedRegistration = Boolean(loggedUser?.registrationCompleted);
   const isAdmin = loggedUser?.role === 'admin';
-  const isPatient = loggedUser?.role === 'paciente';
+  const showProfessionalSearch =
+    isLoggedIn &&
+    hasCompletedRegistration &&
+    location.pathname !== '/complete-registration';
 
   const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl((prev) => (prev ? null : event.currentTarget));
@@ -49,7 +55,7 @@ const Header: React.FC = () => {
             sx={{
               display: 'flex',
               alignItems: 'center',
-              minWidth: 120,
+              minWidth: { xs: 'auto', sm: 220 },
             }}
           >
             {isAdmin && (
@@ -63,6 +69,25 @@ const Header: React.FC = () => {
                 <MenuIcon />
               </IconButton>
             )}
+
+            {isLoggedIn && hasCompletedRegistration && (
+              <Button
+                color="inherit"
+                startIcon={<HomeRoundedIcon />}
+                onClick={() => navigate('/')}
+                sx={{
+                  minWidth: { xs: 40, sm: 'auto' },
+                  px: { xs: 1, sm: 2 },
+                  '& .MuiButton-startIcon': {
+                    mr: { xs: 0, sm: 1 },
+                  },
+                }}
+              >
+                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                  Inicio
+                </Box>
+              </Button>
+            )}
           </Box>
 
           {/* Bloque central */}
@@ -71,28 +96,16 @@ const Header: React.FC = () => {
               flexGrow: 1,
               display: 'flex',
               justifyContent: 'center',
-              px: 2,
+              px: { xs: 0.5, sm: 2 },
             }}
           >
-            {isPatient && (
-              <TextField
-                variant="outlined"
-                size="small"
-                placeholder="Buscar profesional..."
-                sx={{
-                  width: '100%',
-                  maxWidth: 420,
-                  bgcolor: 'background.paper',
-                  borderRadius: 1,
-                }}
-              />
-            )}
+            {showProfessionalSearch && <ProfessionalSearchBar />}
           </Box>
 
           {/* Bloque derecho */}
           <Box
             sx={{
-              minWidth: 220,
+              minWidth: { xs: 'auto', sm: 220 },
               display: 'flex',
               justifyContent: 'flex-end',
               alignItems: 'center',
@@ -115,7 +128,7 @@ const Header: React.FC = () => {
                   Registrarse
                 </Button>
               </Stack>
-            ) : (
+            ) : hasCompletedRegistration ? (
               <Avatar
                 sx={{
                   bgcolor: 'primary.light',
@@ -130,10 +143,10 @@ const Header: React.FC = () => {
               >
                 {`${loggedUser?.firstName[0]}${loggedUser?.lastName[0]}`}
               </Avatar>
-            )}
+            ) : null}
           </Box>
 
-          {isLoggedIn && (
+          {isLoggedIn && hasCompletedRegistration && (
             <UserLoggedInMenu
               loggedUser={loggedUser}
               anchorEl={anchorEl}
